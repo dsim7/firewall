@@ -17,6 +17,7 @@ public class Runner : MonoBehaviour
     
     float curAngle;
     float targetAngle;
+    bool isMoving;
     
     void Start()
     {
@@ -41,14 +42,22 @@ public class Runner : MonoBehaviour
 
     public void MoveRight()
     {
+        //if (!isMoving)
+        //{
+        isMoving = true;
         targetAngle += 360 / FirewallLaneManager.NUM_LANES;
         laneManager.SwitchLanesRight();
+        //}
     }
 
     public void MoveLeft()
     {
+        //if (!isMoving)
+        //{
+        isMoving = true;
         targetAngle -= 360 / FirewallLaneManager.NUM_LANES;
         laneManager.SwitchLanesLeft();
+        //}
     }
 
     void SetPosition()
@@ -60,6 +69,11 @@ public class Runner : MonoBehaviour
                                          pivotPos.y + Mathf.Sin(curAngle * Mathf.Deg2Rad) * radius,
                                          transform.position.z);
         transform.rotation = Quaternion.Euler(transform.rotation.y, transform.rotation.y, curAngle - 90);
+
+        if (curAngle == targetAngle)
+        {
+            isMoving = false;
+        }
     }
 
     void SetCameraPosition()

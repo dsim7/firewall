@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6dfc5cbaef0538146be9a4fbe51f5772, type: 3}
+  m_Name: Script
+  m_EditorClassIdentifier: 
+  texts:
+  - Touch the left and right sides of the screen to move.
+  - Each colored lane of the tunnel has a firewall buffer of the same color.
+  - 'Running into firewall tiles will drain a bit of that lane''s buffer.
+
+
+    If any buffer is completely drained, the game is over.'
+  - Stay out of a lane to let its buffer recharge.
+  - Collect data cubes to gain points.

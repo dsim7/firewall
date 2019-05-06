@@ -30,4 +30,14 @@ public static class HelperMethods
             action.Invoke();
         }
     }
+
+    public static void UpdateTimerUnscaled(ref float timer, float timerEnd, UnityAction action)
+    {
+        timer += Time.unscaledDeltaTime;
+        while (timer > timerEnd)
+        {
+            timer -= timerEnd;
+            action.Invoke();
+        }
+    }
 }

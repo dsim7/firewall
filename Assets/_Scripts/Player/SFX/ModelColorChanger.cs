@@ -14,10 +14,14 @@ public class ModelColorChanger : MonoBehaviour
         main = modelSFX.main;
 
         currentBuffer.RegisterPostchangeEvent(ChangeColor);
+        ChangeColor();
     }
 
     public void ChangeColor()
     {
-        main.startColor = currentBuffer.Value.color2;
+        if (currentBuffer.Value != null)
+        {
+            main.startColor = currentBuffer.Value.color2;
+        }
     }
 }

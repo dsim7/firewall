@@ -12,7 +12,10 @@ public class MenuView : MonoBehaviour
     public FadingDialog highScoreLabel;
     public FadingDialog highScoreText;
     public FadingDialog playButton;
+    public FadingDialog optionsButton;
+    public BufferOrbManager orbManager;
     public BlackMask blackMask;
+    public BoolVariableSO tunnelCleared;
 
     void Start()
     {
@@ -20,6 +23,7 @@ public class MenuView : MonoBehaviour
         highScoreLabel.Disappear();
         highScoreText.Disappear();
         playButton.Disappear();
+        optionsButton.Disappear();
     }
 
     public void Appear()
@@ -46,6 +50,7 @@ public class MenuView : MonoBehaviour
         playButton.Appear();
         highScoreLabel.Appear();
         highScoreText.Appear();
+        optionsButton.Appear();
     }
 
     IEnumerator AppearCoroutine()
@@ -54,8 +59,11 @@ public class MenuView : MonoBehaviour
         title.Appear();
         highScoreLabel.Appear();
         highScoreText.Appear();
+        optionsButton.Appear();
+        orbManager.Disappear();
 
-        yield return new WaitForSeconds(3f);
+        // wait for tunnel to be clear before allowing a new game to start
+        yield return new WaitUntil(() => tunnelCleared.Value);
         playButton.Appear();
     }
 
@@ -65,5 +73,6 @@ public class MenuView : MonoBehaviour
         playButton.Disappear();
         highScoreLabel.Disappear();
         highScoreText.Disappear();
+        optionsButton.Disappear();
     }
 }

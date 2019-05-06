@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 
 public class FirewallBuffer : MonoBehaviour
 {
@@ -13,6 +14,8 @@ public class FirewallBuffer : MonoBehaviour
     public float delayInterval;
     public float recupInterval;
     public bool frozen;
+    [Space]
+    public UnityEvent OnReset;
 
     float delayTimer;
     float recupTimer;
@@ -55,6 +58,7 @@ public class FirewallBuffer : MonoBehaviour
         bufferCount.Value = bufferMax;
         recupTimer = 0;
         delayTimer = 0;
+        OnReset.Invoke();
     }
 
     void Countdown()

@@ -4,64 +4,109 @@ using UnityEngine;
 
 public class Tunnel : MonoBehaviour
 {
-    List<TunnelSegment> segmentPool = new List<TunnelSegment>();
-
-    public BufferCollection buffers;
     public TunnelSegment segmentPrefab;
+    [Space]
     public int poolSize;
-    public float buildSpeed;
-
+    public float startingSpeed;
+    public float speedIncreasePer10s;
+    [Space]
+    public BoolVariableSO playing;
+    public BoolVariableSO inTutorial;
+    public BoolVariableSO tunnelCleared;
+    public TunnelSpawner spawner;
+    public BufferCollection buffers;
+    
+    float segmentLength;
+    [SerializeField]
+    float currentSpeed;
+    float timerToNextBuild;
     int indexOfFirst, indexOfLast;
-    float length;
     TunnelSegment lastSegment { get { return segmentPool[indexOfLast]; } }
     TunnelSegment firstSegment { get { return segmentPool[indexOfFirst]; } }
-
-    float timerToNextBuild;
+    List<TunnelSegment> segmentPool = new List<TunnelSegment>();
 
     void Start()
     {
-        length = segmentPrefab.floorPrefab.firewall.transform.localScale.z;
+        InitSegments();
+
+        // When play starts, tunnel is not clear
+        playing.RegisterPostchangeEvent(() =>
+        {
+            if (playing.Value)
+            {
+                tunnelCleared.Value = false;
+            }
+        });
+
+        currentSpeed = startingSpeed;
+    }
+    
+    void Update()
+    {
+        MoveSegments();
+        TickTimers();
+        IncreaseSpeed();
+    }
+
+    public void ResetSpeed()
+    {
+        currentSpeed = startingSpeed;
+    }
+
+    void InitSegments()
+    {
+        segmentLength = segmentPrefab.floorPrefab.firewall.transform.localScale.z;
 
         for (int i = 0; i < poolSize; i++)
         {
             TunnelSegment newSegment = Instantiate(segmentPrefab, transform);
             newSegment.buffers = buffers;
-            newSegment.transform.position += new Vector3(0, 0, length * i);
+            newSegment.transform.position += new Vector3(0, 0, segmentLength * i);
             segmentPool.Add(newSegment);
         }
         indexOfFirst = 0;
         indexOfLast = segmentPool.Count - 1;
     }
 
-    void Update()
-    {
-        MoveSegments();
-        TickTimeToBuild();
-    }
-
     void MoveSegments()
     {
         foreach (Transform child in transform)
         {
-            child.transform.position = child.transform.position + Vector3.back * length * buildSpeed * Time.deltaTime;
+            child.transform.position = child.transform.position + Vector3.back * segmentLength * currentSpeed * Time.deltaTime;
         }
     }
 
-    void TickTimeToBuild()
+    void TickTimers()
     {
-        timerToNextBuild += Time.deltaTime;
-        while (timerToNextBuild > 1 / buildSpeed)
+        HelperMethods.UpdateTimer(ref timerToNextBuild, 1 / currentSpeed, Build);
+    }
+
+    void IncreaseSpeed()
+    {
+        if (playing.Value && !inTutorial.Value)
         {
-            timerToNextBuild -= 1 / buildSpeed;
-            BuildOne();
+            currentSpeed += (speedIncreasePer10s / 10) * Time.deltaTime;
         }
     }
 
-    void BuildOne()
+    void Build()
     {
-        firstSegment.transform.position = new Vector3(0, 0, lastSegment.transform.position.z + length);
-        firstSegment.Remake();
+        CheckFirstSegmentIsLastOfGame();
+        firstSegment.transform.position = new Vector3(0, 0, lastSegment.transform.position.z + segmentLength);
+
+        spawner.Spawn(firstSegment);
+
         HelperMethods.CyclicalIncrement(ref indexOfFirst, segmentPool.Count);
         HelperMethods.CyclicalIncrement(ref indexOfLast, segmentPool.Count);
+    }
+
+    // When a segment flagged as last segment passes, the tunnel is cleared
+    void CheckFirstSegmentIsLastOfGame()
+    {
+        if (firstSegment.lastSegmentOfGame)
+        {
+            tunnelCleared.Value = true;
+            firstSegment.lastSegmentOfGame = false;
+        }
     }
 }

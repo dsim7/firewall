@@ -14,6 +14,7 @@ public class FirewallBufferManager : MonoBehaviour
         currentBuffer.RegisterPrechangeEvent(SwitchOutOf);
         currentBuffer.RegisterPostchangeEvent(SwitchInto);
         currentBuffer.Value = buffers.red;
+        SwitchInto();
     }
 
     public void Buffer(FirewallBuffer buffer)

@@ -23,8 +23,8 @@ public class BufferOrb : MonoBehaviour
         anim.SetTrigger(startingPlace);
 
         buffer.RegisterPostchangeEvent(UpdateColor);
-        buffer.RegisterPrechangeEvent(UnobserveOldBufferCount);
-        buffer.RegisterPostchangeEvent(ObserveNewBufferCount);
+        buffer.RegisterPrechangeEvent(UnobserveOldBuffer);
+        buffer.RegisterPostchangeEvent(ObserveNewBuffer);
     }
 
     void Update()
@@ -32,18 +32,20 @@ public class BufferOrb : MonoBehaviour
         image.fillAmount = Mathf.MoveTowards(image.fillAmount, targetFill, fillRate * Time.deltaTime);
     }
 
-    void UnobserveOldBufferCount()
+    void UnobserveOldBuffer()
     {
         if (buffer.Value != null)
         {
+            buffer.Value.OnReset.RemoveListener(UpdateInstant);
             buffer.Value.bufferCount.UnregisterPostchangeEvent(UpdateInfo);
         }
     }
 
-    void ObserveNewBufferCount()
+    void ObserveNewBuffer()
     {
         if (buffer.Value != null)
         {
+            buffer.Value.OnReset.AddListener(UpdateInstant);
             buffer.Value.bufferCount.RegisterPostchangeEvent(UpdateInfo);
         }
     }

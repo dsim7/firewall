@@ -25,20 +25,13 @@ public class BufferOrbManager : MonoBehaviour
 
     public void Appear()
     {
+        gameObject.SetActive(true);
         anim.SetTrigger("Appear");
     }
 
     public void Disappear()
     {
         anim.SetTrigger("Disappear");
-    }
-
-    public void UpdateInstant()
-    {
-        foreach (BufferOrb orb in bufferOrbs)
-        {
-            orb.UpdateInstant();
-        }
     }
 
     public void RotateLeft()

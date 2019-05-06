@@ -32,7 +32,7 @@ public class TunnelFloor : MonoBehaviour
         firewall.SetToDefault();
     }
 
-    public void SetWhite(Material white)
+    public void SetFirewall(Material white)
     {
         firewall.SetWhite(white);
     }

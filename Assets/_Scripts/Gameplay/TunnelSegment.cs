@@ -6,14 +6,12 @@ public class TunnelSegment : MonoBehaviour
 {
     public TunnelFloor floorPrefab;
     [Space]
-    public BoolVariableSO building;
     public float radius = 10;
     public float travelSpeed = 10;
-    public float probabilityWhite = 0.3f;
-    public float probabilityCube = 0.3f;
     public Material firewallMaterial;
     
     public BufferCollection buffers { get; set; }
+    public bool lastSegmentOfGame { get; set; }
 
     List<TunnelFloor> floors;
 
@@ -31,7 +29,6 @@ public class TunnelSegment : MonoBehaviour
             newFloor.transform.localPosition = spawnPoint;
             newFloor.transform.localRotation = Quaternion.Euler(0, 0, angle);
             floors.Add(newFloor);
-            
         }
         
         floors[0].buffer = buffers.red;
@@ -46,32 +43,59 @@ public class TunnelSegment : MonoBehaviour
         floors[6].buffer = buffers.blue;
         floors[7].buffer = buffers.blue;
 
-        SetAllDefault();
+        RemakeBlank();
     }
 
-    public void Remake()
+    public void Remake(float probabilityFirewall, float probabilityCube)
     {
         foreach (TunnelFloor floor in floors)
         {
             floor.ClearCube();
-            DetermineFloorIsFirewall(floor);
-            DetermineFloorHasDataCube(floor);
+            DetermineFloorIsFirewallRandom(floor, probabilityFirewall);
+            DetermineFloorHasDataCubeRandom(floor, probabilityCube);
         }
     }
 
-    void SetAllDefault()
+    public void RemakeBlank()
     {
         foreach (TunnelFloor floor in floors)
         {
+            floor.ClearCube();
             floor.SetToDefault();
         }
     }
-    
-    void DetermineFloorIsFirewall(TunnelFloor floor)
+
+    public void Remake(short[] layout, int startIndex = 0)
     {
-        if (building.Value && Random.Range(0f, 1f) < probabilityWhite)
+        int indexToBuild = startIndex;
+        for (int i = 0; i < floors.Count; i++)
         {
-            floor.SetWhite(firewallMaterial);
+            TunnelFloor floor = floors[indexToBuild];
+            floor.ClearCube();
+            
+            if ((layout[i] & (short)FloorType.Bad) != 0)
+            {
+                floor.SetFirewall(firewallMaterial);
+            }
+            else
+            {
+                floor.SetToDefault();
+            }
+
+            if ((layout[i] & (short)FloorType.HasCube) != 0)
+            {
+                floor.MakeDataCube();
+            }
+
+            HelperMethods.CyclicalIncrement(ref indexToBuild, floors.Count);
+        }
+    }
+    
+    void DetermineFloorIsFirewallRandom(TunnelFloor floor, float probability)
+    {
+        if (Random.Range(0f, 1f) < probability)
+        {
+            floor.SetFirewall(firewallMaterial);
         }
         else
         {
@@ -79,9 +103,9 @@ public class TunnelSegment : MonoBehaviour
         }
     }
 
-    void DetermineFloorHasDataCube(TunnelFloor floor)
+    void DetermineFloorHasDataCubeRandom(TunnelFloor floor, float probability)
     {
-        if (building.Value && Random.Range(0f, 1f) < probabilityCube)
+        if (Random.Range(0f, 1f) < probability)
         {
             floor.MakeDataCube();
         }
