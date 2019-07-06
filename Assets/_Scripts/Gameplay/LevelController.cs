@@ -15,6 +15,10 @@ public class LevelController : MonoBehaviour
 
     public UnityEvent OnStart;
 
+    int passivePointIncrement = 3;
+    float passivePointsTimeInterval = 0.1f;
+    float passivePointsTimer = 0;
+
     void Start()
     {
         playing.Value = false;
@@ -24,6 +28,19 @@ public class LevelController : MonoBehaviour
         OnStart.Invoke();
     }
 
+    private void Update()
+    {
+        if (playing.Value)
+        {
+            passivePointsTimer += Time.deltaTime;
+            while (passivePointsTimer > passivePointsTimeInterval)
+            {
+                score.Value += passivePointIncrement;
+                passivePointsTimer -= passivePointsTimeInterval;
+            }
+        }
+    }
+
     public void Play()
     {
         lives.Value = 1;
@@ -31,6 +48,8 @@ public class LevelController : MonoBehaviour
         bufferManager.ResetAll();
         bufferManager.FreezeAll(false);
         playing.Value = true;
+
+        passivePointsTimer = 0;
     }
 
     public void StoppedPlaying()
